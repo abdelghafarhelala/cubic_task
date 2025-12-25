@@ -1,0 +1,55 @@
+name: cubic_task
+description: "Secure Banking Branch Locator - Flutter Technical Assessment"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Icons
+  cupertino_icons: ^1.0.8
+  flutter_credit_card: ^4.1.0
+
+  # State Management
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+
+  # Firebase
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+
+  # Network
+  dio: ^5.7.0
+
+  # Local Storage & Encryption
+  sqflite: ^2.3.3+2
+  sqflite_sqlcipher: ^3.3.0
+  path_provider: ^2.1.4
+  flutter_secure_storage: ^9.2.2
+
+  # Biometric Authentication
+  local_auth: ^2.3.0
+
+  # Maps & Location
+  google_maps_flutter: ^2.9.0
+  geolocator: ^13.0.1
+  geocoding: ^3.0.0
+
+  # Utilities
+  connectivity_plus: ^6.1.0
+  intl: ^0.19.0
+  uuid: ^4.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
