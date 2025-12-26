@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/components/custom_text_form_field.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/input_validators.dart';
-import 'password_field.dart';
 
 class SignUpFormFields extends StatelessWidget {
   final TextEditingController emailController;
@@ -29,32 +29,29 @@ class SignUpFormFields extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextFormField(
+        CustomTextFormField(
           controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-            prefixIcon: Icon(Icons.email_outlined),
-          ),
-          validator: InputValidators.validateEmail,
+          labelText: 'Email',
+          fieldType: FieldType.email,
         ),
         const SizedBox(height: AppTheme.spacingMD),
-        PasswordField(
+        CustomTextFormField(
           controller: passwordController,
-          obscureText: obscurePassword,
           labelText: 'Password',
+          fieldType: FieldType.password,
+          obscureText: obscurePassword,
           onToggleVisibility: onTogglePassword,
         ),
         const SizedBox(height: AppTheme.spacingMD),
-        PasswordField(
+        CustomTextFormField(
           controller: confirmPasswordController,
-          obscureText: obscureConfirmPassword,
           labelText: 'Confirm Password',
-          validator: validateConfirmPassword,
+          fieldType: FieldType.password,
+          obscureText: obscureConfirmPassword,
           onToggleVisibility: onToggleConfirmPassword,
+          validator: validateConfirmPassword,
         ),
       ],
     );
   }
 }
-

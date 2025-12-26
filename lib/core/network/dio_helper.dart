@@ -19,15 +19,11 @@ class DioHelper {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    try {
-      return await dio.get(
-        url,
-        queryParameters: queryParameters,
-        options: options,
-      );
-    } catch (e) {
-      rethrow;
-    }
+    return await dio.get(
+      url,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   static Future<Response> postData({
@@ -36,15 +32,11 @@ class DioHelper {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    try {
-      return await dio.post(
-        url,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-    } catch (e) {
-      rethrow;
-    }
+    return await dio.post(
+      url,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 }

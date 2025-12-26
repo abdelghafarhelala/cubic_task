@@ -61,19 +61,24 @@ class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
           ),
         );
       } else if (mounted) {
+        // User cancelled the authentication dialog
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Biometric setup cancelled or failed'),
+            content: Text('Biometric setup was cancelled'),
             backgroundColor: AppTheme.secondaryRed,
+            duration: Duration(seconds: 2),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
+        // Show specific error message
+        final errorMessage = e.toString().replaceFirst('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(errorMessage),
             backgroundColor: AppTheme.secondaryRed,
+            duration: const Duration(seconds: 4),
           ),
         );
       }

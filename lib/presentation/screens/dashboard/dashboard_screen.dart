@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/components/custom_elevated_button.dart';
+import '../../../core/di/service_locator.dart';
 import '../../../core/security/biometric_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../bloc/auth/auth_cubit.dart';
+import '../../bloc/map/map_cubit.dart';
 import '../../widgets/account_card.dart';
 import '../../widgets/credit_card_widget.dart';
 import '../../widgets/recent_transactions.dart';
@@ -33,6 +36,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _generateMockData();
     _checkBiometricOnLaunch();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadLocations();
+    });
+  }
+
+  /// Preloads locations from API in background isolate
+  /// This runs in a separate thread/isolate, not blocking the main UI thread
+  /// Data will be ready when user navigates to map screen
+  ///
+  /// **Optimization**: Called after first frame is rendered to ensure fast startup
+  void _preloadLocations() {
+    final mapCubit = getIt<MapCubit>();
+    mapCubit.loadLocations();
   }
 
   void _generateMockData() {
@@ -53,7 +69,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (isEnabled) {
       final authenticated = await _biometricService.authenticate();
       if (!authenticated && mounted) {
-        // If biometric fails, sign out
         context.read<AuthCubit>().signOut();
       }
     }
@@ -83,59 +98,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          _generateMockData();
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(AppTheme.spacingMD),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Account Card
-              if (_accountNumber != null && _balance != null)
-                AccountCard(
-                  accountNumber: _accountNumber!,
-                  balance: _balance!,
-                ),
-              const SizedBox(height: AppTheme.spacingLG),
-              // Credit Card Widget
-              if (_cardNumber != null &&
-                  _cardHolder != null &&
-                  _expiryDate != null &&
-                  _cardType != null)
-                CreditCardWidget(
-                  cardNumber: _cardNumber!,
-                  cardHolder: _cardHolder!,
-                  expiryDate: _expiryDate!,
-                  cardType: _cardType!,
-                ),
-              const SizedBox(height: AppTheme.spacingLG),
-              // Recent Transactions
-              if (_transactions != null)
-                RecentTransactions(transactions: _transactions!),
-              const SizedBox(height: AppTheme.spacingXL),
-              // Find Nearest Branches Button
-              ElevatedButton(
-                onPressed: _navigateToMap,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 56),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
+        children: [
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                _generateMockData();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(AppTheme.spacingMD),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(Icons.location_on),
-                    SizedBox(width: 8),
-                    Text('Find Nearest Branches'),
+                    if (_accountNumber != null && _balance != null)
+                      AccountCard(
+                        accountNumber: _accountNumber!,
+                        balance: _balance!,
+                      ),
+                    const SizedBox(height: AppTheme.spacingLG),
+                    if (_cardNumber != null &&
+                        _cardHolder != null &&
+                        _expiryDate != null &&
+                        _cardType != null)
+                      CreditCardWidget(
+                        cardNumber: _cardNumber!,
+                        cardHolder: _cardHolder!,
+                        expiryDate: _expiryDate!,
+                        cardType: _cardType!,
+                      ),
+                    const SizedBox(height: AppTheme.spacingLG),
+                    if (_transactions != null)
+                      RecentTransactions(transactions: _transactions!),
+                    const SizedBox(height: AppTheme.spacingXL),
+                    const SizedBox(height: AppTheme.spacingLG),
                   ],
                 ),
               ),
-              const SizedBox(height: AppTheme.spacingLG),
-            ],
+            ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spacingMD),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: CustomElevatedButton(
+              onPressed: _navigateToMap,
+              text: 'Find Nearest Branches',
+              icon: Icons.location_on,
+            ),
+          ),
+        ],
       ),
     );
   }

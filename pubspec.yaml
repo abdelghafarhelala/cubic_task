@@ -12,12 +12,14 @@ dependencies:
     sdk: flutter
 
   # UI & Icons
-  cupertino_icons: ^1.0.8
   flutter_credit_card: ^4.1.0
 
   # State Management
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
+  
+  # Dependency Injection
+  get_it: ^7.7.0
 
   # Firebase
   firebase_core: ^3.6.0
@@ -26,6 +28,7 @@ dependencies:
 
   # Network
   dio: ^5.7.0
+  http: ^1.2.2
 
   # Local Storage & Encryption
   sqflite: ^2.3.3+2
@@ -36,15 +39,15 @@ dependencies:
   # Biometric Authentication
   local_auth: ^2.3.0
 
-  # Maps & Location
-  google_maps_flutter: ^2.9.0
+  # Maps & Location (Free - No API Key Required)
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
   geolocator: ^13.0.1
-  geocoding: ^3.0.0
 
   # Utilities
   connectivity_plus: ^6.1.0
   intl: ^0.19.0
-  uuid: ^4.5.1
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

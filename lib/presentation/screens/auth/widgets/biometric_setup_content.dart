@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/components/custom_elevated_button.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class BiometricSetupContent extends StatelessWidget {
@@ -43,23 +45,10 @@ class BiometricSetupContent extends StatelessWidget {
         ),
         const SizedBox(height: AppTheme.spacingXXL),
         if (isAvailable)
-          ElevatedButton(
-            onPressed: isLoading ? null : onEnable,
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 56),
-            ),
-            child: isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppTheme.textLight,
-                      ),
-                    ),
-                  )
-                : Text('Enable $biometricType'),
+          CustomElevatedButton(
+            onPressed: onEnable,
+            text: 'Enable $biometricType',
+            isLoading: isLoading,
           ),
         const SizedBox(height: AppTheme.spacingMD),
         TextButton(
@@ -70,4 +59,3 @@ class BiometricSetupContent extends StatelessWidget {
     );
   }
 }
-

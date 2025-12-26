@@ -33,12 +33,12 @@ class AccountCard extends StatelessWidget {
               Text(
                 'Account Balance',
                 style: AppTheme.bodyText.copyWith(
-                  color: AppTheme.textLight.withOpacity(0.9),
+                  color: AppTheme.textLight.withValues(alpha: 0.9),
                 ),
               ),
               Icon(
                 Icons.account_balance,
-                color: AppTheme.textLight.withOpacity(0.9),
+                color: AppTheme.textLight.withValues(alpha: 0.9),
               ),
             ],
           ),
@@ -56,7 +56,7 @@ class AccountCard extends StatelessWidget {
               Text(
                 'Account Number: ',
                 style: AppTheme.bodyTextSmall.copyWith(
-                  color: AppTheme.textLight.withOpacity(0.8),
+                  color: AppTheme.textLight.withValues(alpha: 0.8),
                 ),
               ),
               Text(

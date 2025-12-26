@@ -55,7 +55,7 @@ class TransactionItem extends StatelessWidget {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: _getCategoryColor(transaction.category).withOpacity(0.1),
+          color: _getCategoryColor(transaction.category).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppTheme.radiusSM),
         ),
         child: Icon(

@@ -51,5 +51,7 @@
 	<string>We need your location to find nearby branches and ATMs</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to find nearby branches and ATMs</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>We need Face ID to secure your banking app</string>
 </dict>
 </plist>

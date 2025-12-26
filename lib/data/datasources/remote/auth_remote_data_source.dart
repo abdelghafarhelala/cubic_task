@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../core/errors/failures.dart';
 import '../../models/user_model.dart';
 
@@ -74,8 +75,3 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 }
-
-
-
-
-

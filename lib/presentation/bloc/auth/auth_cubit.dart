@@ -1,26 +1,40 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/di/service_locator.dart';
 import '../../../core/errors/failures.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../favorites/favorites_cubit.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository authRepository;
+  StreamSubscription<User?>? _authSubscription;
 
   AuthCubit({required this.authRepository}) : super(const AuthState()) {
     _checkAuthState();
   }
 
   void _checkAuthState() {
-    authRepository.authStateChanges.listen((User? user) {
+    _authSubscription = authRepository.authStateChanges.listen((User? user) {
       if (user != null) {
+        final userModel = UserModel.fromFirebaseUser(user);
         emit(state.copyWith(
           status: AuthStatus.authenticated,
-          user: UserModel.fromFirebaseUser(user),
+          user: userModel,
           clearError: true,
         ));
+
+        // Initialize favorites cubit when user logs in
+        try {
+          final favoritesCubit = getIt<FavoritesCubit>();
+          favoritesCubit.setUserId(userModel.uid);
+        } catch (e) {
+          // Silently handle - favorites cubit might not be registered yet
+        }
       } else {
         emit(state.copyWith(
           status: AuthStatus.unauthenticated,
@@ -31,11 +45,16 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
+  @override
+  Future<void> close() {
+    _authSubscription?.cancel();
+    return super.close();
+  }
+
   Future<void> signUp(String email, String password) async {
     emit(state.copyWith(status: AuthStatus.loading, clearError: true));
     try {
       final user = await authRepository.signUp(email, password);
-      print('user: $user');
       emit(state.copyWith(
         status: AuthStatus.authenticated,
         user: user,

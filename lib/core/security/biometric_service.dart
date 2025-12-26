@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
+
 import '../constants/app_constants.dart';
 
 class BiometricService {
@@ -10,7 +11,18 @@ class BiometricService {
     LocalAuthentication? localAuth,
     FlutterSecureStorage? secureStorage,
   })  : _localAuth = localAuth ?? LocalAuthentication(),
-        _secureStorage = secureStorage ?? const FlutterSecureStorage();
+        _secureStorage = secureStorage ??
+            const FlutterSecureStorage(
+              // Enhanced security configuration
+              // Android: Use EncryptedSharedPreferences for hardware-backed encryption
+              // iOS: Uses Keychain which is hardware-backed by default
+              aOptions: AndroidOptions(
+                encryptedSharedPreferences: true,
+              ),
+              iOptions: IOSOptions(
+                accessibility: KeychainAccessibility.first_unlock_this_device,
+              ),
+            );
 
   Future<bool> isBiometricAvailable() async {
     try {
@@ -32,7 +44,8 @@ class BiometricService {
 
   Future<bool> isBiometricEnabled() async {
     try {
-      final value = await _secureStorage.read(key: AppConstants.biometricEnabledKey);
+      final value =
+          await _secureStorage.read(key: AppConstants.biometricEnabledKey);
       return value == 'true';
     } catch (e) {
       return false;
@@ -88,29 +101,58 @@ class BiometricService {
     try {
       final isAvailable = await isBiometricAvailable();
       if (!isAvailable) {
-        return false;
+        throw Exception(
+            'Biometric authentication is not available on this device');
       }
 
-      final didAuthenticate = await _localAuth.authenticate(
-        localizedReason: 'Enable biometric authentication for quick access',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
-      );
-
-      if (didAuthenticate) {
-        await enableBiometric();
+      // Check if biometrics are enrolled
+      final availableBiometrics = await getAvailableBiometrics();
+      if (availableBiometrics.isEmpty) {
+        throw Exception(
+            'No biometrics enrolled. Please set up Face ID or Touch ID in device settings');
       }
 
-      return didAuthenticate;
+      try {
+        final didAuthenticate = await _localAuth.authenticate(
+          localizedReason: 'Enable biometric authentication for quick access',
+          options: const AuthenticationOptions(
+            biometricOnly: true,
+            stickyAuth: true,
+          ),
+        );
+
+        if (didAuthenticate) {
+          await enableBiometric();
+          return true;
+        } else {
+          // User cancelled the authentication dialog
+          return false;
+        }
+      } catch (e) {
+        // Handle specific authentication errors
+        final errorString = e.toString().toLowerCase();
+        if (errorString.contains('notenrolled')) {
+          throw Exception(
+              'No biometrics enrolled. Please set up Face ID or Touch ID in device settings');
+        } else if (errorString.contains('lockedout') ||
+            errorString.contains('permanentlylockedout')) {
+          throw Exception(
+              'Biometric authentication is locked. Please unlock your device');
+        } else if (errorString.contains('notavailable')) {
+          throw Exception(
+              'Biometric authentication is not available on this device');
+        } else if (errorString.contains('passcode')) {
+          throw Exception('Please set up a passcode on your device first');
+        } else {
+          throw Exception('Biometric authentication failed: ${e.toString()}');
+        }
+      }
     } catch (e) {
-      return false;
+      // Re-throw exceptions as-is (they already have good messages)
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Failed to setup biometric: ${e.toString()}');
     }
   }
 }
-
-
-
-
-
