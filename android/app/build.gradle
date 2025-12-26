@@ -36,8 +36,37 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
+            
+            // Enable code obfuscation and minification
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile('proguard-android-optimize.txt'),
+                'proguard-rules.pro'
+            )
+            
+            // Additional security settings
+            debuggable = false
+            jniDebuggable = false
+            renderscriptDebuggable = false
         }
     }
+    
+    // Configure R8 to be less strict about missing classes
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0']
+        }
+    }
+}
+
+configurations.all {
+    // Exclude old Google Play Core to avoid duplicate class conflicts
+    exclude group: 'com.google.android.play', module: 'core'
+}
+
+dependencies {
+    // Note: Google Play Core is not needed - ProGuard rules handle optional dependencies
 }
 
 flutter {
